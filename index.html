@@ -1,0 +1,1327 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ETERNAUTA — Oltre i Confini del Cosmo</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Exo+2:ital,wght@0,200;0,400;1,300&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --void: #020408;
+    --deep: #060d16;
+    --cosmos: #0a1628;
+    --nebula: #0d2137;
+    --pulse: #00d4ff;
+    --aurora: #7b2fff;
+    --signal: #ff3c6e;
+    --gold: #f5c542;
+    --green: #00ff88;
+    --text: #c8dff0;
+    --dim: #5a7a90;
+    --font-head: 'Orbitron', monospace;
+    --font-body: 'Exo 2', sans-serif;
+    --font-mono: 'Share Tech Mono', monospace;
+  }
+
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--void);
+    color: var(--text);
+    font-family: var(--font-body);
+    overflow-x: hidden;
+    cursor: crosshair;
+  }
+
+  /* ─── STARFIELD ─── */
+  #starfield {
+    position: fixed; inset: 0; z-index: 0;
+    pointer-events: none;
+    overflow: hidden;
+  }
+  .star {
+    position: absolute;
+    border-radius: 50%;
+    background: #fff;
+    animation: twinkle var(--d, 3s) ease-in-out infinite alternate;
+    opacity: var(--o, 0.6);
+  }
+  @keyframes twinkle {
+    from { opacity: var(--o); transform: scale(1); }
+    to   { opacity: calc(var(--o) * 0.2); transform: scale(0.5); }
+  }
+
+  /* ─── PROGRESS BAR ─── */
+  #progress-wrap {
+    position: fixed; top: 70px; left: 0; right: 0; z-index: 200;
+    height: 3px; background: rgba(0,212,255,0.08);
+  }
+  #progress-bar {
+    height: 100%; width: 0%;
+    background: linear-gradient(90deg, var(--aurora), var(--pulse), var(--green));
+    transition: width 0.1s linear;
+    box-shadow: 0 0 12px var(--pulse), 0 0 30px var(--aurora);
+    position: relative;
+  }
+  #progress-bar::after {
+    content: '';
+    position: absolute; right: -4px; top: -3px;
+    width: 10px; height: 10px; border-radius: 50%;
+    background: var(--pulse);
+    box-shadow: 0 0 16px var(--pulse);
+  }
+
+  /* ─── HEADER ─── */
+  header {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 300;
+    height: 70px;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0 2rem;
+    background: rgba(2,4,8,0.85);
+    backdrop-filter: blur(20px);
+    border-bottom: 1px solid rgba(0,212,255,0.12);
+  }
+  #logo {
+    font-family: var(--font-head);
+    font-size: 1.1rem; font-weight: 900;
+    letter-spacing: 0.25em;
+    text-decoration: none;
+    color: var(--pulse);
+    text-shadow: 0 0 20px var(--pulse), 0 0 40px rgba(0,212,255,0.3);
+    transition: text-shadow 0.3s;
+    display: flex; align-items: center; gap: 0.6rem;
+  }
+  #logo:hover { text-shadow: 0 0 30px var(--pulse), 0 0 60px var(--pulse); }
+  #logo .logo-icon { font-size: 1.4rem; animation: spin-slow 8s linear infinite; display: inline-block; }
+  @keyframes spin-slow { to { transform: rotate(360deg); } }
+
+  /* ─── HAMBURGER ─── */
+  #hamburger {
+    display: flex; flex-direction: column; gap: 5px;
+    cursor: pointer; padding: 8px; background: none; border: none;
+    z-index: 400;
+  }
+  #hamburger span {
+    display: block; width: 26px; height: 2px;
+    background: var(--pulse);
+    transition: all 0.35s cubic-bezier(0.77,0,0.18,1);
+    box-shadow: 0 0 8px var(--pulse);
+  }
+  #hamburger.open span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+  #hamburger.open span:nth-child(2) { opacity: 0; transform: scaleX(0); }
+  #hamburger.open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+
+  /* ─── NAV OVERLAY ─── */
+  #nav-overlay {
+    position: fixed; inset: 0; z-index: 250;
+    background: rgba(2,4,8,0.96);
+    backdrop-filter: blur(30px);
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    gap: 2rem;
+    opacity: 0; pointer-events: none;
+    transition: opacity 0.4s ease;
+  }
+  #nav-overlay.open { opacity: 1; pointer-events: all; }
+  #nav-overlay a {
+    font-family: var(--font-head);
+    font-size: clamp(1.2rem, 3vw, 2rem);
+    letter-spacing: 0.2em;
+    color: var(--text);
+    text-decoration: none;
+    position: relative;
+    transition: color 0.3s;
+    padding: 0.3rem 1rem;
+  }
+  #nav-overlay a::before {
+    content: '◈ ';
+    color: var(--pulse);
+    font-size: 0.7em;
+    opacity: 0;
+    transition: opacity 0.3s;
+  }
+  #nav-overlay a:hover { color: var(--pulse); }
+  #nav-overlay a:hover::before { opacity: 1; }
+  .nav-num {
+    font-family: var(--font-mono);
+    font-size: 0.65rem;
+    color: var(--aurora);
+    margin-right: 0.8rem;
+    letter-spacing: 0.1em;
+  }
+
+  /* ─── HERO ─── */
+  #home {
+    position: relative; min-height: 100vh;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    text-align: center; padding: 2rem;
+    overflow: hidden;
+  }
+  .hero-grid {
+    position: absolute; inset: 0;
+    background-image:
+      linear-gradient(rgba(0,212,255,0.04) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(0,212,255,0.04) 1px, transparent 1px);
+    background-size: 60px 60px;
+    animation: grid-drift 20s linear infinite;
+  }
+  @keyframes grid-drift { to { background-position: 60px 60px; } }
+
+  .hero-content { position: relative; z-index: 2; max-width: 860px; }
+  .hero-eyebrow {
+    font-family: var(--font-mono);
+    font-size: 0.75rem; letter-spacing: 0.35em;
+    color: var(--aurora);
+    margin-bottom: 1.5rem;
+    animation: fade-up 1s ease forwards;
+    opacity: 0; animation-delay: 0.3s;
+  }
+  .hero-title {
+    font-family: var(--font-head);
+    font-size: clamp(2.8rem, 8vw, 6.5rem);
+    font-weight: 900; line-height: 1;
+    letter-spacing: 0.05em;
+    background: linear-gradient(135deg, #fff 20%, var(--pulse) 50%, var(--aurora) 80%);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    animation: fade-up 1s ease forwards;
+    opacity: 0; animation-delay: 0.5s;
+    margin-bottom: 0.4rem;
+  }
+  .hero-subtitle-line {
+    font-family: var(--font-head);
+    font-size: clamp(0.9rem, 2vw, 1.3rem);
+    letter-spacing: 0.4em;
+    color: var(--gold);
+    margin-bottom: 2rem;
+    opacity: 0; animation: fade-up 1s ease forwards; animation-delay: 0.7s;
+  }
+  .hero-desc {
+    font-size: 1.05rem; line-height: 1.8;
+    color: var(--dim);
+    max-width: 580px; margin: 0 auto 2.5rem;
+    opacity: 0; animation: fade-up 1s ease forwards; animation-delay: 0.9s;
+  }
+  .hero-cta {
+    display: inline-flex; align-items: center; gap: 0.8rem;
+    padding: 0.9rem 2.4rem;
+    border: 1px solid var(--pulse);
+    color: var(--pulse);
+    font-family: var(--font-head);
+    font-size: 0.75rem; letter-spacing: 0.25em;
+    text-decoration: none;
+    position: relative; overflow: hidden;
+    transition: color 0.3s;
+    opacity: 0; animation: fade-up 1s ease forwards; animation-delay: 1.1s;
+  }
+  .hero-cta::before {
+    content: ''; position: absolute; inset: 0;
+    background: var(--pulse); transform: scaleX(0);
+    transform-origin: left; transition: transform 0.4s ease;
+    z-index: -1;
+  }
+  .hero-cta:hover { color: var(--void); }
+  .hero-cta:hover::before { transform: scaleX(1); }
+
+  @keyframes fade-up {
+    from { opacity: 0; transform: translateY(30px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  /* ─── SCAN LINE ─── */
+  .scan-line {
+    position: absolute; left: 0; right: 0; height: 2px;
+    background: linear-gradient(90deg, transparent, var(--pulse), transparent);
+    animation: scan 6s ease-in-out infinite;
+    opacity: 0.3;
+  }
+  @keyframes scan {
+    0%   { top: 0%; }
+    100% { top: 100%; }
+  }
+
+  /* ─── UFO ANIMATIONS ─── */
+  .ufo {
+    position: absolute;
+    z-index: 1;
+    animation: ufo-fly var(--dur, 18s) linear infinite;
+    opacity: 0.85;
+  }
+  @keyframes ufo-fly {
+    0%   { transform: translate(-120px, var(--sy, 0px)) scale(var(--sc, 1)); opacity: 0; }
+    5%   { opacity: 0.85; }
+    95%  { opacity: 0.85; }
+    100% { transform: translate(calc(100vw + 120px), var(--ey, -60px)) scale(var(--sc, 1)); opacity: 0; }
+  }
+  .ufo svg { filter: drop-shadow(0 0 12px var(--pulse)) drop-shadow(0 0 24px var(--aurora)); }
+  .ufo-beam {
+    position: absolute;
+    width: 0; height: 0;
+    border-left: 14px solid transparent;
+    border-right: 14px solid transparent;
+    border-top: 40px solid rgba(0,212,255,0.18);
+    left: 50%; transform: translateX(-50%);
+    top: 100%; filter: blur(3px);
+    animation: beam-pulse 2s ease-in-out infinite;
+  }
+  @keyframes beam-pulse {
+    0%,100% { opacity: 0.18; }
+    50% { opacity: 0.45; }
+  }
+
+  /* UFO floating variant */
+  .ufo-float {
+    position: absolute;
+    z-index: 3;
+    animation: float-ufo var(--dur, 10s) ease-in-out infinite;
+  }
+  @keyframes float-ufo {
+    0%,100% { transform: translateY(0) rotate(-3deg); }
+    50% { transform: translateY(-25px) rotate(3deg); }
+  }
+
+  /* ─── SECTIONS COMMON ─── */
+  section {
+    position: relative; z-index: 5;
+    padding: 6rem 2rem;
+  }
+  .section-inner { max-width: 1100px; margin: 0 auto; }
+  .section-label {
+    font-family: var(--font-mono);
+    font-size: 0.7rem; letter-spacing: 0.4em;
+    color: var(--aurora);
+    margin-bottom: 0.8rem;
+    display: flex; align-items: center; gap: 0.6rem;
+  }
+  .section-label::before { content: ''; flex: 0 0 30px; height: 1px; background: var(--aurora); }
+  .section-title {
+    font-family: var(--font-head);
+    font-size: clamp(1.8rem, 4vw, 3rem);
+    font-weight: 700; letter-spacing: 0.05em;
+    color: #fff;
+    margin-bottom: 1rem;
+    line-height: 1.1;
+  }
+  .section-desc {
+    font-size: 1rem; line-height: 1.9;
+    color: var(--dim);
+    max-width: 600px;
+    margin-bottom: 3.5rem;
+  }
+
+  /* ─── HERO CARDS ─── */
+  .cards-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 1.5rem;
+  }
+  .card {
+    position: relative;
+    background: linear-gradient(135deg, rgba(13,33,55,0.9), rgba(6,13,22,0.95));
+    border: 1px solid rgba(0,212,255,0.12);
+    padding: 2rem;
+    overflow: hidden;
+    transition: transform 0.4s ease, border-color 0.4s ease, box-shadow 0.4s ease;
+    cursor: default;
+  }
+  .card::before {
+    content: '';
+    position: absolute; top: 0; left: 0;
+    width: 100%; height: 3px;
+    background: var(--card-accent, linear-gradient(90deg, var(--pulse), var(--aurora)));
+    transform: scaleX(0); transform-origin: left;
+    transition: transform 0.4s ease;
+  }
+  .card:hover { transform: translateY(-8px); border-color: rgba(0,212,255,0.3); box-shadow: 0 20px 60px rgba(0,0,0,0.5), 0 0 40px rgba(0,212,255,0.06); }
+  .card:hover::before { transform: scaleX(1); }
+  .card-icon {
+    font-size: 2.8rem; margin-bottom: 1.2rem;
+    display: inline-block;
+    animation: icon-pulse 3s ease-in-out infinite;
+  }
+  @keyframes icon-pulse {
+    0%,100% { filter: drop-shadow(0 0 6px currentColor); }
+    50% { filter: drop-shadow(0 0 20px currentColor) drop-shadow(0 0 40px currentColor); }
+  }
+  .card-tag {
+    font-family: var(--font-mono);
+    font-size: 0.65rem; letter-spacing: 0.3em;
+    color: var(--aurora); margin-bottom: 0.6rem;
+  }
+  .card h3 {
+    font-family: var(--font-head);
+    font-size: 1rem; font-weight: 700;
+    letter-spacing: 0.1em; color: #fff;
+    margin-bottom: 0.8rem; line-height: 1.3;
+  }
+  .card p {
+    font-size: 0.88rem; line-height: 1.75;
+    color: var(--dim);
+  }
+  .card-corner {
+    position: absolute; bottom: 1rem; right: 1rem;
+    font-family: var(--font-mono); font-size: 0.6rem;
+    color: rgba(0,212,255,0.2);
+  }
+  .card-bg-glyph {
+    position: absolute; right: -20px; bottom: -20px;
+    font-size: 8rem; opacity: 0.03; line-height: 1;
+    font-family: var(--font-head);
+  }
+
+  /* ─── SECTION: RICERCA ─── */
+  #ricerca { background: linear-gradient(180deg, var(--void) 0%, var(--cosmos) 50%, var(--void) 100%); }
+
+  /* ─── TIMELINE ─── */
+  .timeline { position: relative; padding-left: 2rem; }
+  .timeline::before {
+    content: ''; position: absolute; left: 0; top: 0; bottom: 0;
+    width: 1px; background: linear-gradient(180deg, transparent, var(--pulse) 20%, var(--aurora) 80%, transparent);
+  }
+  .tl-item {
+    position: relative; margin-bottom: 2.5rem;
+    padding-left: 2.5rem;
+    opacity: 0; transform: translateX(-20px);
+    transition: opacity 0.6s ease, transform 0.6s ease;
+  }
+  .tl-item.visible { opacity: 1; transform: translateX(0); }
+  .tl-dot {
+    position: absolute; left: -2rem;
+    top: 0.3rem;
+    width: 14px; height: 14px; border-radius: 50%;
+    background: var(--pulse);
+    box-shadow: 0 0 0 4px rgba(0,212,255,0.15), 0 0 20px var(--pulse);
+    transform: translateX(-6px);
+  }
+  .tl-year {
+    font-family: var(--font-mono); font-size: 0.7rem;
+    color: var(--gold); letter-spacing: 0.2em;
+    margin-bottom: 0.3rem;
+  }
+  .tl-title {
+    font-family: var(--font-head); font-size: 0.95rem;
+    color: #fff; margin-bottom: 0.4rem; letter-spacing: 0.05em;
+  }
+  .tl-text { font-size: 0.85rem; color: var(--dim); line-height: 1.7; }
+
+  /* ─── AVVISTAMENTI ─── */
+  #avvistamenti { 
+    background: radial-gradient(ellipse at 50% 50%, rgba(123,47,255,0.08) 0%, var(--void) 60%);
+  }
+  .sighting-card {
+    background: rgba(13,33,55,0.5);
+    border: 1px solid rgba(123,47,255,0.2);
+    padding: 1.5rem 2rem;
+    margin-bottom: 1rem;
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    align-items: center; gap: 1.5rem;
+    transition: all 0.3s ease;
+    position: relative; overflow: hidden;
+  }
+  .sighting-card::after {
+    content: ''; position: absolute; inset: 0;
+    background: linear-gradient(90deg, rgba(123,47,255,0.05), transparent);
+    opacity: 0; transition: opacity 0.3s;
+  }
+  .sighting-card:hover::after { opacity: 1; }
+  .sighting-card:hover { border-color: rgba(123,47,255,0.5); transform: translateX(6px); }
+  .sighting-num {
+    font-family: var(--font-mono); font-size: 1.5rem;
+    color: rgba(123,47,255,0.3); font-weight: bold;
+    min-width: 3rem;
+  }
+  .sighting-loc {
+    font-family: var(--font-head); font-size: 0.85rem;
+    letter-spacing: 0.1em; color: #fff; margin-bottom: 0.2rem;
+  }
+  .sighting-detail { font-size: 0.8rem; color: var(--dim); }
+  .sighting-class {
+    font-family: var(--font-mono); font-size: 0.65rem;
+    padding: 0.3rem 0.7rem;
+    border: 1px solid;
+    letter-spacing: 0.15em;
+  }
+  .class-I   { color: var(--green); border-color: var(--green); }
+  .class-II  { color: var(--gold); border-color: var(--gold); }
+  .class-III { color: var(--signal); border-color: var(--signal); }
+
+  /* ─── COSMO ─── */
+  #cosmo { background: linear-gradient(180deg, var(--void), var(--deep)); }
+  .cosmos-cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 1.5rem; }
+  .cosmos-card {
+    padding: 2rem 1.5rem; text-align: center;
+    border: 1px solid rgba(0,212,255,0.08);
+    background: linear-gradient(180deg, rgba(10,22,40,0.8), rgba(6,13,22,0.9));
+    position: relative; overflow: hidden;
+    transition: transform 0.4s ease, box-shadow 0.4s ease;
+  }
+  .cosmos-card:hover { transform: translateY(-6px); box-shadow: 0 0 40px rgba(0,212,255,0.1); }
+  .cosmos-num {
+    font-family: var(--font-head); font-size: 3.5rem; font-weight: 900;
+    background: linear-gradient(135deg, var(--pulse), var(--aurora));
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    line-height: 1; margin-bottom: 0.5rem;
+  }
+  .cosmos-label { font-family: var(--font-mono); font-size: 0.7rem; color: var(--dim); letter-spacing: 0.2em; margin-bottom: 0.8rem; }
+  .cosmos-desc { font-size: 0.82rem; color: var(--dim); line-height: 1.6; }
+
+  /* ─── MANIFESTO ─── */
+  #manifesto {
+    background: linear-gradient(135deg, rgba(123,47,255,0.05) 0%, rgba(0,212,255,0.03) 100%);
+    text-align: center;
+  }
+  .manifesto-quote {
+    font-family: var(--font-head);
+    font-size: clamp(1.4rem, 3.5vw, 2.4rem);
+    line-height: 1.6; letter-spacing: 0.05em;
+    color: rgba(255,255,255,0.9);
+    max-width: 820px; margin: 0 auto 2rem;
+    position: relative;
+  }
+  .manifesto-quote::before {
+    content: '"';
+    font-size: 8rem; line-height: 0;
+    color: rgba(0,212,255,0.08);
+    position: absolute; top: 1rem; left: -1rem;
+    font-family: serif;
+  }
+  .manifesto-source {
+    font-family: var(--font-mono); font-size: 0.75rem;
+    color: var(--aurora); letter-spacing: 0.3em;
+  }
+
+  /* ─── CONTATTO ─── */
+  #contatto { background: var(--void); }
+  .contact-grid {
+    display: grid; grid-template-columns: 1fr 1fr;
+    gap: 3rem; align-items: center;
+  }
+  @media (max-width: 700px) { .contact-grid { grid-template-columns: 1fr; } }
+  .freq-display {
+    font-family: var(--font-mono);
+    font-size: clamp(2rem, 5vw, 3.5rem);
+    color: var(--pulse);
+    text-shadow: 0 0 30px var(--pulse);
+    animation: freq-flicker 4s ease-in-out infinite;
+    letter-spacing: 0.1em;
+  }
+  @keyframes freq-flicker {
+    0%,100% { opacity: 1; }
+    92% { opacity: 1; }
+    93% { opacity: 0.4; }
+    94% { opacity: 1; }
+    97% { opacity: 0.6; }
+    98% { opacity: 1; }
+  }
+  .freq-label { font-family: var(--font-mono); font-size: 0.7rem; color: var(--dim); letter-spacing: 0.3em; margin-top: 0.5rem; }
+  .signal-bars {
+    display: flex; align-items: flex-end; gap: 5px;
+    height: 40px; margin-top: 1.5rem;
+  }
+  .sig-bar {
+    width: 8px; background: var(--pulse);
+    border-radius: 2px 2px 0 0;
+    box-shadow: 0 0 8px var(--pulse);
+    animation: bar-animate var(--d, 1s) ease-in-out infinite alternate;
+  }
+  @keyframes bar-animate {
+    from { transform: scaleY(0.2); opacity: 0.3; }
+    to   { transform: scaleY(1); opacity: 1; }
+  }
+  .contact-form { display: flex; flex-direction: column; gap: 1rem; }
+  .form-field {
+    background: rgba(0,212,255,0.03);
+    border: 1px solid rgba(0,212,255,0.15);
+    padding: 0.85rem 1rem;
+    color: var(--text); font-family: var(--font-body); font-size: 0.9rem;
+    outline: none; transition: border-color 0.3s, box-shadow 0.3s;
+    width: 100%;
+  }
+  .form-field::placeholder { color: var(--dim); }
+  .form-field:focus { border-color: var(--pulse); box-shadow: 0 0 20px rgba(0,212,255,0.1); }
+  textarea.form-field { resize: vertical; min-height: 120px; }
+  .form-btn {
+    background: transparent; border: 1px solid var(--pulse);
+    color: var(--pulse); font-family: var(--font-head);
+    font-size: 0.75rem; letter-spacing: 0.25em;
+    padding: 1rem 2rem; cursor: pointer;
+    transition: all 0.3s ease; position: relative; overflow: hidden;
+  }
+  .form-btn::before {
+    content: ''; position: absolute; inset: 0;
+    background: var(--pulse); transform: scaleX(0);
+    transform-origin: left; transition: transform 0.4s ease; z-index: -1;
+  }
+  .form-btn:hover { color: var(--void); }
+  .form-btn:hover::before { transform: scaleX(1); }
+
+  /* ─── FOOTER ─── */
+  footer {
+    background: rgba(2,4,8,0.98);
+    border-top: 1px solid rgba(0,212,255,0.1);
+    padding: 3rem 2rem 2rem;
+    text-align: center;
+    position: relative; z-index: 5;
+  }
+  .footer-logo {
+    font-family: var(--font-head); font-size: 1.5rem; font-weight: 900;
+    color: var(--pulse); letter-spacing: 0.2em;
+    margin-bottom: 1.5rem;
+    text-shadow: 0 0 20px var(--pulse);
+  }
+  .socials {
+    display: flex; justify-content: center; gap: 1rem; flex-wrap: wrap;
+    margin-bottom: 2rem;
+  }
+  .social-link {
+    display: flex; align-items: center; gap: 0.5rem;
+    padding: 0.6rem 1.2rem;
+    border: 1px solid rgba(0,212,255,0.15);
+    color: var(--dim); text-decoration: none;
+    font-family: var(--font-mono); font-size: 0.7rem;
+    letter-spacing: 0.15em;
+    transition: all 0.3s ease;
+    position: relative; overflow: hidden;
+  }
+  .social-link:hover {
+    color: var(--pulse); border-color: var(--pulse);
+    box-shadow: 0 0 20px rgba(0,212,255,0.15);
+  }
+  .social-icon { font-size: 1rem; }
+  .footer-copy {
+    font-family: var(--font-mono); font-size: 0.65rem;
+    color: rgba(90,122,144,0.5); letter-spacing: 0.2em;
+    line-height: 2;
+  }
+  .footer-divider {
+    width: 60px; height: 1px;
+    background: linear-gradient(90deg, transparent, var(--pulse), transparent);
+    margin: 1.5rem auto;
+  }
+
+  /* ─── TOP BUTTON ─── */
+  #top-btn {
+    position: fixed; bottom: 2rem; right: 2rem;
+    z-index: 500;
+    width: 48px; height: 48px;
+    background: rgba(2,4,8,0.9);
+    border: 1px solid var(--pulse);
+    color: var(--pulse); font-size: 1.2rem;
+    cursor: pointer; display: flex; align-items: center; justify-content: center;
+    opacity: 0; pointer-events: none;
+    transition: all 0.3s ease;
+    box-shadow: 0 0 20px rgba(0,212,255,0.2);
+    backdrop-filter: blur(10px);
+    clip-path: polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%);
+  }
+  #top-btn.visible { opacity: 1; pointer-events: all; }
+  #top-btn:hover {
+    background: var(--pulse); color: var(--void);
+    box-shadow: 0 0 30px var(--pulse);
+    transform: rotate(45deg) scale(1.1);
+  }
+
+  /* ─── SCROLL REVEAL ─── */
+  .reveal {
+    opacity: 0; transform: translateY(40px);
+    transition: opacity 0.7s ease, transform 0.7s ease;
+  }
+  .reveal.visible { opacity: 1; transform: translateY(0); }
+
+  /* ─── NEBULA BG ─── */
+  .nebula-bg {
+    position: absolute; inset: 0; pointer-events: none; overflow: hidden; z-index: 0;
+  }
+  .nebula-orb {
+    position: absolute; border-radius: 50%;
+    filter: blur(80px); opacity: 0.15;
+    animation: nebula-drift var(--nd, 20s) ease-in-out infinite alternate;
+  }
+  @keyframes nebula-drift {
+    from { transform: translate(0, 0) scale(1); }
+    to   { transform: translate(var(--tx, 30px), var(--ty, 20px)) scale(1.1); }
+  }
+
+  /* ─── GLITCH TEXT ─── */
+  .glitch {
+    position: relative;
+    animation: glitch-base 8s infinite;
+  }
+  @keyframes glitch-base {
+    0%,96%,100% { text-shadow: none; }
+    97% { text-shadow: -3px 0 var(--signal), 3px 0 var(--aurora); }
+    98% { text-shadow: 3px 0 var(--signal), -3px 0 var(--aurora); }
+    99% { text-shadow: none; }
+  }
+
+  /* ─── DATA TICKER ─── */
+  .ticker-wrap {
+    background: rgba(0,212,255,0.04);
+    border-top: 1px solid rgba(0,212,255,0.1);
+    border-bottom: 1px solid rgba(0,212,255,0.1);
+    overflow: hidden; padding: 0.6rem 0;
+    margin: 4rem 0;
+    position: relative;
+  }
+  .ticker-track {
+    display: flex; gap: 4rem;
+    animation: ticker-scroll 30s linear infinite;
+    white-space: nowrap;
+  }
+  .ticker-item {
+    font-family: var(--font-mono); font-size: 0.7rem;
+    color: rgba(0,212,255,0.5); letter-spacing: 0.2em;
+    flex-shrink: 0;
+  }
+  .ticker-dot { color: var(--aurora); margin-right: 0.5rem; }
+  @keyframes ticker-scroll { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+
+  /* ─── RESPONSIVE ─── */
+  @media (max-width: 768px) {
+    .sighting-card { grid-template-columns: auto 1fr; }
+    .sighting-class { display: none; }
+    header { padding: 0 1rem; }
+  }
+
+  /* ─── CURSOR ─── */
+  .cursor-dot {
+    position: fixed; width: 6px; height: 6px;
+    background: var(--pulse); border-radius: 50%;
+    pointer-events: none; z-index: 9999;
+    transform: translate(-50%, -50%);
+    transition: transform 0.1s ease;
+    box-shadow: 0 0 10px var(--pulse);
+  }
+  .cursor-ring {
+    position: fixed; width: 30px; height: 30px;
+    border: 1px solid rgba(0,212,255,0.4); border-radius: 50%;
+    pointer-events: none; z-index: 9998;
+    transform: translate(-50%, -50%);
+    transition: transform 0.15s ease, width 0.3s, height 0.3s;
+  }
+</style>
+</head>
+<body>
+
+<!-- CURSOR -->
+<div class="cursor-dot" id="cursorDot"></div>
+<div class="cursor-ring" id="cursorRing"></div>
+
+<!-- STARFIELD -->
+<div id="starfield"></div>
+
+<!-- HEADER -->
+<header>
+  <a href="#home" id="logo">
+    <span class="logo-icon">✦</span>
+    ETERNAUTA
+  </a>
+  <button id="hamburger" aria-label="Menu">
+    <span></span><span></span><span></span>
+  </button>
+</header>
+
+<!-- PROGRESS BAR -->
+<div id="progress-wrap"><div id="progress-bar"></div></div>
+
+<!-- NAV OVERLAY -->
+<div id="nav-overlay">
+  <a href="#home" class="nav-link"><span class="nav-num">01 —</span> Inizio Viaggio</a>
+  <a href="#ricerca" class="nav-link"><span class="nav-num">02 —</span> Ricerca</a>
+  <a href="#avvistamenti" class="nav-link"><span class="nav-num">03 —</span> Avvistamenti</a>
+  <a href="#cosmo" class="nav-link"><span class="nav-num">04 —</span> Il Cosmo</a>
+  <a href="#manifesto" class="nav-link"><span class="nav-num">05 —</span> Manifesto</a>
+  <a href="#contatto" class="nav-link"><span class="nav-num">06 —</span> Contatto</a>
+</div>
+
+<!-- ══════════════════════════ HERO ══════════════════════════ -->
+<section id="home">
+  <div class="hero-grid"></div>
+  <div class="scan-line"></div>
+
+  <!-- UFOs flying across -->
+  <div class="ufo" style="--dur:22s; --sy:-20px; --ey:-80px; --sc:0.8; top:20%; animation-delay:2s;">
+    <div style="position:relative;">
+      <svg width="80" height="40" viewBox="0 0 80 40">
+        <ellipse cx="40" cy="28" rx="38" ry="10" fill="rgba(0,212,255,0.15)" stroke="rgba(0,212,255,0.6)" stroke-width="1.5"/>
+        <ellipse cx="40" cy="22" rx="22" ry="12" fill="rgba(0,212,255,0.2)" stroke="rgba(0,212,255,0.5)" stroke-width="1"/>
+        <ellipse cx="40" cy="18" rx="12" ry="8" fill="rgba(123,47,255,0.4)" stroke="rgba(123,47,255,0.8)" stroke-width="1"/>
+        <circle cx="40" cy="17" r="4" fill="rgba(200,230,255,0.9)"/>
+        <circle cx="28" cy="26" r="2" fill="rgba(0,255,136,0.8)"/>
+        <circle cx="52" cy="26" r="2" fill="rgba(255,60,110,0.8)"/>
+        <circle cx="40" cy="28" r="2" fill="rgba(245,197,66,0.8)"/>
+      </svg>
+      <div class="ufo-beam"></div>
+    </div>
+  </div>
+
+  <div class="ufo" style="--dur:30s; --sy:40px; --ey:-20px; --sc:0.5; top:65%; animation-delay:8s;">
+    <div style="position:relative;">
+      <svg width="60" height="30" viewBox="0 0 60 30">
+        <ellipse cx="30" cy="20" rx="28" ry="8" fill="rgba(123,47,255,0.15)" stroke="rgba(123,47,255,0.6)" stroke-width="1.5"/>
+        <ellipse cx="30" cy="16" rx="16" ry="9" fill="rgba(123,47,255,0.2)" stroke="rgba(123,47,255,0.5)" stroke-width="1"/>
+        <circle cx="30" cy="12" r="5" fill="rgba(200,150,255,0.8)"/>
+        <circle cx="20" cy="19" r="2" fill="rgba(0,255,136,0.8)"/>
+        <circle cx="40" cy="19" r="2" fill="rgba(0,212,255,0.8)"/>
+      </svg>
+      <div class="ufo-beam" style="border-top-color:rgba(123,47,255,0.2)"></div>
+    </div>
+  </div>
+
+  <div class="ufo" style="--dur:18s; --sy:-60px; --ey:20px; --sc:1.2; top:45%; animation-delay:14s;">
+    <div style="position:relative;">
+      <svg width="100" height="50" viewBox="0 0 100 50">
+        <ellipse cx="50" cy="35" rx="46" ry="13" fill="rgba(255,60,110,0.1)" stroke="rgba(255,60,110,0.5)" stroke-width="1.5"/>
+        <ellipse cx="50" cy="27" rx="28" ry="15" fill="rgba(255,60,110,0.15)" stroke="rgba(255,60,110,0.4)" stroke-width="1"/>
+        <ellipse cx="50" cy="20" rx="15" ry="10" fill="rgba(255,100,140,0.3)" stroke="rgba(255,60,110,0.6)" stroke-width="1"/>
+        <circle cx="50" cy="17" r="6" fill="rgba(255,200,200,0.9)"/>
+        <circle cx="34" cy="33" r="2.5" fill="rgba(0,212,255,0.8)"/>
+        <circle cx="50" cy="35" r="2.5" fill="rgba(245,197,66,0.8)"/>
+        <circle cx="66" cy="33" r="2.5" fill="rgba(0,255,136,0.8)"/>
+      </svg>
+      <div class="ufo-beam" style="border-top-color:rgba(255,60,110,0.15)"></div>
+    </div>
+  </div>
+
+  <!-- Floating UFO in hero -->
+  <div class="ufo-float" style="--dur:8s; right:8%; top:30%; opacity:0.6;">
+    <svg width="120" height="60" viewBox="0 0 120 60">
+      <defs>
+        <radialGradient id="g1" cx="50%" cy="50%" r="50%">
+          <stop offset="0%" stop-color="rgba(0,212,255,0.6)"/>
+          <stop offset="100%" stop-color="rgba(0,212,255,0)"/>
+        </radialGradient>
+      </defs>
+      <ellipse cx="60" cy="42" rx="56" ry="16" fill="rgba(0,212,255,0.08)" stroke="rgba(0,212,255,0.4)" stroke-width="1.5"/>
+      <ellipse cx="60" cy="32" rx="34" ry="18" fill="rgba(0,212,255,0.1)" stroke="rgba(0,212,255,0.35)" stroke-width="1"/>
+      <ellipse cx="60" cy="22" rx="18" ry="12" fill="rgba(123,47,255,0.3)" stroke="rgba(123,47,255,0.7)" stroke-width="1.5"/>
+      <circle cx="60" cy="20" r="7" fill="rgba(220,240,255,0.95)"/>
+      <circle cx="42" cy="40" r="3" fill="rgba(0,255,136,0.9)"/>
+      <circle cx="60" cy="43" r="3" fill="rgba(245,197,66,0.9)"/>
+      <circle cx="78" cy="40" r="3" fill="rgba(255,60,110,0.9)"/>
+      <!-- halo glow -->
+      <ellipse cx="60" cy="42" rx="56" ry="16" fill="url(#g1)" opacity="0.4"/>
+    </svg>
+  </div>
+
+  <div class="hero-content">
+    <div class="hero-eyebrow">◈ CLASSIFICAZIONE: NON-TERRESTRE ◈ LIVELLO ACCESSO: OMEGA</div>
+    <h1 class="hero-title glitch">ETERNAUTA</h1>
+    <div class="hero-subtitle-line">VIAGGIATORE DELL'ETERNO</div>
+    <p class="hero-desc">
+      Oltre le stelle conosciute, oltre il velo della materia ordinaria — una missione di ricerca ai confini del cosmo. Avvistamenti, fenomeni, frequenze aliene. La verità non è nascosta. È solo troppo grande per essere vista.
+    </p>
+    <a href="#ricerca" class="hero-cta">
+      <span>⬡</span> INIZIA L'ESPLORAZIONE
+    </a>
+  </div>
+</section>
+
+<!-- DATA TICKER -->
+<div style="position:relative;z-index:5;">
+<div class="ticker-wrap">
+  <div class="ticker-track">
+    <span class="ticker-item"><span class="ticker-dot">◈</span>SEGNALE RILEVATO — FREQUENZA 1420 MHz</span>
+    <span class="ticker-item"><span class="ticker-dot">◈</span>AVVISTAMENTO CONFERMATO — ZONA DELTA-7</span>
+    <span class="ticker-item"><span class="ticker-dot">◈</span>GALASSIE CATALOGATE: 2 TRILIONI</span>
+    <span class="ticker-item"><span class="ticker-dot">◈</span>ESOPIANETI ABITABILI: 300 MILIONI STIMATI</span>
+    <span class="ticker-item"><span class="ticker-dot">◈</span>UAP DOCUMENTATI: 143+ [FONTE: DOD]</span>
+    <span class="ticker-item"><span class="ticker-dot">◈</span>DISTANZA ANDROMEDA: 2.537 MILIONI ANNI LUCE</span>
+    <span class="ticker-item"><span class="ticker-dot">◈</span>SEGNALE RILEVATO — FREQUENZA 1420 MHz</span>
+    <span class="ticker-item"><span class="ticker-dot">◈</span>AVVISTAMENTO CONFERMATO — ZONA DELTA-7</span>
+    <span class="ticker-item"><span class="ticker-dot">◈</span>GALASSIE CATALOGATE: 2 TRILIONI</span>
+    <span class="ticker-item"><span class="ticker-dot">◈</span>ESOPIANETI ABITABILI: 300 MILIONI STIMATI</span>
+    <span class="ticker-item"><span class="ticker-dot">◈</span>UAP DOCUMENTATI: 143+ [FONTE: DOD]</span>
+    <span class="ticker-item"><span class="ticker-dot">◈</span>DISTANZA ANDROMEDA: 2.537 MILIONI ANNI LUCE</span>
+  </div>
+</div>
+</div>
+
+<!-- ══════════════════════ RICERCA ══════════════════════ -->
+<section id="ricerca">
+  <div class="nebula-bg">
+    <div class="nebula-orb" style="width:500px;height:500px;background:var(--aurora);top:10%;left:-10%;--nd:25s;--tx:40px;--ty:30px;"></div>
+    <div class="nebula-orb" style="width:300px;height:300px;background:var(--pulse);top:50%;right:5%;--nd:18s;--tx:-20px;--ty:40px;"></div>
+  </div>
+  <div class="section-inner">
+    <div class="section-label reveal">SEZIONE 02</div>
+    <h2 class="section-title reveal">La Ricerca<br><span style="color:var(--pulse);">oltre il Velo</span></h2>
+    <p class="section-desc reveal">Decenni di dati, testimonianze, frequenze radio e immagini satellitari. La scienza ufficiale e quella non ufficiale convergono su un punto: non siamo soli.</p>
+
+    <div class="cards-grid reveal">
+      <div class="card" style="--card-accent: linear-gradient(90deg, var(--pulse), #00aaff);">
+        <div class="card-bg-glyph">⬡</div>
+        <div class="card-icon" style="color:var(--pulse);">📡</div>
+        <div class="card-tag">PROGRAMMA SETI</div>
+        <h3>ASCOLTO DEL COSMO</h3>
+        <p>Dal 1960, l'umanità punta telescopi verso le stelle in cerca di segnali artificiali. Il Segnale WOW del 1977 rimane inspiegabile: 72 secondi di trasmissione dalla costellazione del Sagittario.</p>
+        <div class="card-corner">NODE.001</div>
+      </div>
+
+      <div class="card" style="--card-accent: linear-gradient(90deg, var(--aurora), #aa00ff);">
+        <div class="card-bg-glyph">◎</div>
+        <div class="card-icon" style="color:var(--aurora);">🔬</div>
+        <div class="card-tag">ASTROBIOLOGIA</div>
+        <h3>VITA NELL'UNIVERSO</h3>
+        <p>La scoperta di molecole organiche complesse in meteoriti e atmosfere planetarie suggerisce che i mattoni della vita siano ubiqui. Marte, Europa, Encelado: candidati primari.</p>
+        <div class="card-corner">NODE.002</div>
+      </div>
+
+      <div class="card" style="--card-accent: linear-gradient(90deg, var(--gold), #ff8800);">
+        <div class="card-bg-glyph">△</div>
+        <div class="card-icon" style="color:var(--gold);">🛸</div>
+        <div class="card-tag">FENOMENI UAP</div>
+        <h3>OGGETTI NON IDENTIFICATI</h3>
+        <p>Il Pentagono ha declassificato centinaia di casi. Velocità ipersoniche, manovre anti-fisiche, materiali con struttura atomica sconosciuta: i dati sfidano ogni spiegazione convenzionale.</p>
+        <div class="card-corner">NODE.003</div>
+      </div>
+
+      <div class="card" style="--card-accent: linear-gradient(90deg, var(--signal), #ff6600);">
+        <div class="card-bg-glyph">⬢</div>
+        <div class="card-icon" style="color:var(--signal);">🧬</div>
+        <div class="card-tag">PANSPERMIA</div>
+        <h3>SEMI TRA LE STELLE</h3>
+        <p>La teoria della panspermia propone che la vita si propaghi attraverso lo spazio su asteroidi e comete. Batteri resistenti alle radiazioni, come il Deinococcus radiodurans, sopravvivono nello spazio.</p>
+        <div class="card-corner">NODE.004</div>
+      </div>
+
+      <div class="card" style="--card-accent: linear-gradient(90deg, var(--green), #00cc66);">
+        <div class="card-bg-glyph">✦</div>
+        <div class="card-icon" style="color:var(--green);">🌌</div>
+        <div class="card-tag">MATERIA OSCURA</div>
+        <h3>IL 95% INVISIBILE</h3>
+        <p>Solo il 5% dell'universo è materia visibile. Il resto: materia oscura ed energia oscura. Alcune teorie suggeriscono che civiltà avanzate possano manipolare queste forze per la propulsione interstellare.</p>
+        <div class="card-corner">NODE.005</div>
+      </div>
+
+      <div class="card" style="--card-accent: linear-gradient(90deg, #ff3c6e, var(--aurora));">
+        <div class="card-bg-glyph">◈</div>
+        <div class="card-icon" style="color:#ff7aa0;">🔭</div>
+        <div class="card-tag">JAMES WEBB</div>
+        <h3>OCCHI NELL'INFINITO</h3>
+        <p>Il telescopio JWST ha rivoluzionato la nostra comprensione dell'universo primordiale. Galassie formate 300 milioni di anni dopo il Big Bang sfidano i modelli cosmologici standard.</p>
+        <div class="card-corner">NODE.006</div>
+      </div>
+    </div>
+
+    <!-- TIMELINE -->
+    <div style="margin-top:5rem;">
+      <div class="section-label reveal">CRONOLOGIA</div>
+      <h3 class="section-title reveal" style="font-size:clamp(1.4rem,3vw,2rem);margin-bottom:2rem;">Pietre Miliari<br><span style="color:var(--pulse);">dell'Esobiologia</span></h3>
+      <div class="timeline reveal">
+        <div class="tl-item">
+          <div class="tl-dot"></div>
+          <div class="tl-year">1947</div>
+          <div class="tl-title">INCIDENTE DI ROSWELL</div>
+          <div class="tl-text">Crash nel deserto del New Mexico. L'USAF parla prima di "disco volante", poi corregge in "pallone meteorologico". La contraddizione alimenta 80 anni di speculazioni.</div>
+        </div>
+        <div class="tl-item">
+          <div class="tl-dot"></div>
+          <div class="tl-year">1977</div>
+          <div class="tl-title">SEGNALE WOW</div>
+          <div class="tl-text">Jerry Ehman scrive "Wow!" sul tabulato del radiotelescopio Big Ear. Un segnale a 1420 MHz, durato 72 secondi, mai più ripetuto. Origine: Sagittario.</div>
+        </div>
+        <div class="tl-item">
+          <div class="tl-dot"></div>
+          <div class="tl-year">1996</div>
+          <div class="tl-title">METEORITE ALH84001</div>
+          <div class="tl-text">La NASA annuncia possibili microfossili batterici nel meteorite marziano. La scoperta scatena un dibattito scientifico ancora irrisolto.</div>
+        </div>
+        <div class="tl-item">
+          <div class="tl-dot"></div>
+          <div class="tl-year">2017</div>
+          <div class="tl-title">VIDEO UAP DEL PENTAGONO</div>
+          <div class="tl-text">Tre filmati dei caccia F/A-18 vengono declassificati dal DOD. Oggetti con comportamento fisicamente impossibile filmati dai sistemi di targeting militari.</div>
+        </div>
+        <div class="tl-item">
+          <div class="tl-dot" style="background:var(--gold);box-shadow:0 0 0 4px rgba(245,197,66,0.15), 0 0 20px var(--gold);"></div>
+          <div class="tl-year">2024</div>
+          <div class="tl-title">UFFICIALIZZAZIONE UAP AL CONGRESSO USA</div>
+          <div class="tl-text">Per la prima volta nella storia, testimonianze sotto giuramento al Congresso dichiarano il recupero di veicoli non umani. L'era del silenzio ufficiale è finita.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════ AVVISTAMENTI ══════════════════════ -->
+<section id="avvistamenti">
+  <div class="nebula-bg">
+    <div class="nebula-orb" style="width:600px;height:400px;background:var(--aurora);top:30%;right:-15%;--nd:22s;--tx:-50px;--ty:20px;"></div>
+  </div>
+  <div class="section-inner">
+    <div class="section-label reveal">SEZIONE 03</div>
+    <h2 class="section-title reveal">Avvistamenti<br><span style="color:var(--aurora);">Documentati</span></h2>
+    <p class="section-desc reveal">Casi classificati per livello di evidenza. Fonti: militari, piloti civili, astronomi, testimonianze multiple non correlate.</p>
+
+    <!-- UFO floating in section -->
+    <div class="ufo-float" style="--dur:12s; position:absolute; right:3%; top:15%; opacity:0.5; z-index:1;">
+      <svg width="80" height="40" viewBox="0 0 80 40">
+        <ellipse cx="40" cy="28" rx="36" ry="10" fill="rgba(123,47,255,0.12)" stroke="rgba(123,47,255,0.5)" stroke-width="1.5"/>
+        <ellipse cx="40" cy="20" rx="20" ry="12" fill="rgba(123,47,255,0.18)" stroke="rgba(123,47,255,0.4)" stroke-width="1"/>
+        <circle cx="40" cy="16" r="5" fill="rgba(180,130,255,0.9)"/>
+        <circle cx="28" cy="27" r="2" fill="rgba(255,60,110,0.8)"/>
+        <circle cx="52" cy="27" r="2" fill="rgba(0,212,255,0.8)"/>
+      </svg>
+    </div>
+
+    <div class="reveal">
+      <div class="sighting-card">
+        <div class="sighting-num">01</div>
+        <div>
+          <div class="sighting-loc">GOLFO DEL MESSICO — 2004</div>
+          <div class="sighting-detail">Caso Nimitz: piloti della USS Nimitz intercettano oggetto a forma di tic-tac. Velocità stimata: 25.000 km/h. Nessuna firma termica, nessuna propulsione visibile.</div>
+        </div>
+        <div class="sighting-class class-III">CLASSE III</div>
+      </div>
+
+      <div class="sighting-card">
+        <div class="sighting-num">02</div>
+        <div>
+          <div class="sighting-loc">RENDLESHAM FOREST, UK — 1980</div>
+          <div class="sighting-detail">Personale militare della RAF Woodbridge osserva luci nel bosco. Il colonnello Halt registra su audiocassetta la testimonianza in tempo reale. Radiazioni anomale misurate sugli alberi.</div>
+        </div>
+        <div class="sighting-class class-III">CLASSE III</div>
+      </div>
+
+      <div class="sighting-card">
+        <div class="sighting-num">03</div>
+        <div>
+          <div class="sighting-loc">PHOENIX LIGHTS, ARIZONA — 1997</div>
+          <div class="sighting-detail">Una formazione luminosa a V di circa 1,6 km di apertura sorvola la città. Più di 10.000 testimoni. Il governatore dell'Arizona, inizialmente ironico, ammette in seguito di aver visto l'oggetto.</div>
+        </div>
+        <div class="sighting-class class-II">CLASSE II</div>
+      </div>
+
+      <div class="sighting-card">
+        <div class="sighting-num">04</div>
+        <div>
+          <div class="sighting-loc">FUKUSHIMA, GIAPPONE — 2011</div>
+          <div class="sighting-detail">Telecamere di sorveglianza della centrale nucleare riprendono sfere luminose dopo il disastro. Simili avvistamenti storicamente documentati sopra impianti nucleari di USA e URSS.</div>
+        </div>
+        <div class="sighting-class class-II">CLASSE II</div>
+      </div>
+
+      <div class="sighting-card">
+        <div class="sighting-num">05</div>
+        <div>
+          <div class="sighting-loc">TRANS-EN-PROVENCE, FRANCIA — 1981</div>
+          <div class="sighting-detail">Analisi del GEPAN (governo francese) sul sito di atterraggio: suolo compresso a 50 tonnellate, vegetazione alterata geneticamente. Caso con la più alta analisi fisica governativa al mondo.</div>
+        </div>
+        <div class="sighting-class class-I">CLASSE I</div>
+      </div>
+
+      <div class="sighting-card">
+        <div class="sighting-num">06</div>
+        <div>
+          <div class="sighting-loc">ARIEL SCHOOL, ZIMBABWE — 1994</div>
+          <div class="sighting-detail">62 bambini di 8-12 anni osservano l'atterraggio di un oggetto metallico e figure umanoidi. Lo psichiatra John Mack di Harvard valuta i testimoni: tutti considerati attendibili e senza traumi precedenti.</div>
+        </div>
+        <div class="sighting-class class-I">CLASSE I</div>
+      </div>
+    </div>
+
+    <div class="ticker-wrap reveal" style="margin-top:3rem;">
+      <div class="ticker-track">
+        <span class="ticker-item"><span class="ticker-dot">▸</span>CLASSE I: EVIDENZA FISICA CONFERMATA</span>
+        <span class="ticker-item"><span class="ticker-dot">▸</span>CLASSE II: TESTIMONIANZE MULTIPLE CORRELATE</span>
+        <span class="ticker-item"><span class="ticker-dot">▸</span>CLASSE III: DOCUMENTAZIONE MILITARE/GOVERNATIVA</span>
+        <span class="ticker-item"><span class="ticker-dot">▸</span>CLASSE I: EVIDENZA FISICA CONFERMATA</span>
+        <span class="ticker-item"><span class="ticker-dot">▸</span>CLASSE II: TESTIMONIANZE MULTIPLE CORRELATE</span>
+        <span class="ticker-item"><span class="ticker-dot">▸</span>CLASSE III: DOCUMENTAZIONE MILITARE/GOVERNATIVA</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════ COSMO ══════════════════════ -->
+<section id="cosmo">
+  <div class="section-inner">
+    <div class="section-label reveal">SEZIONE 04</div>
+    <h2 class="section-title reveal">Il Cosmo<br><span style="color:var(--pulse);">in Numeri</span></h2>
+    <p class="section-desc reveal">La vastità dell'universo rende la solitudine cosmica l'ipotesi statisticamente più improbabile. I dati parlano da soli.</p>
+
+    <div class="cosmos-cards reveal">
+      <div class="cosmos-card">
+        <div class="cosmos-num">2×10¹²</div>
+        <div class="cosmos-label">GALASSIE NELL'UNIVERSO</div>
+        <div class="cosmos-desc">Due trilioni di galassie, ciascuna con miliardi di stelle. La Via Lattea ne ospita 200 miliardi.</div>
+      </div>
+      <div class="cosmos-card">
+        <div class="cosmos-num">40B</div>
+        <div class="cosmos-label">PIANETI ABITABILI STIMATI</div>
+        <div class="cosmos-desc">Solo nella Via Lattea, circa 40 miliardi di pianeti in zona abitabile attorno a stelle simili al Sole.</div>
+      </div>
+      <div class="cosmos-card">
+        <div class="cosmos-num">13.8B</div>
+        <div class="cosmos-label">ANNI DEL COSMO</div>
+        <div class="cosmos-desc">L'universo ha 13,8 miliardi di anni. Civiltà con 100.000 anni di vantaggio sarebbero tecnologicamente incomprensibili per noi.</div>
+      </div>
+      <div class="cosmos-card">
+        <div class="cosmos-num">5.000+</div>
+        <div class="cosmos-label">ESOPIANETI CONFERMATI</div>
+        <div class="cosmos-desc">Dal 1992 ad oggi: oltre 5.000 mondi confermati, molti con condizioni potenzialmente compatibili con la vita.</div>
+      </div>
+      <div class="cosmos-card">
+        <div class="cosmos-num">95%</div>
+        <div class="cosmos-label">UNIVERSO INVISIBILE</div>
+        <div class="cosmos-desc">Materia ed energia oscura costituiscono il 95% dell'universo. La fisica conosciuta descrive solo una minima parte della realtà.</div>
+      </div>
+      <div class="cosmos-card">
+        <div class="cosmos-num">≈0</div>
+        <div class="cosmos-label">PROBABILITÀ DI SOLITUDINE</div>
+        <div class="cosmos-desc">Statisticamente, l'ipotesi della Terra Rara richiede coincidenze talmente improbabili da risultare matematicamente insostenibile.</div>
+      </div>
+    </div>
+
+    <!-- Cards descrittive cosmo -->
+    <div class="cards-grid reveal" style="margin-top:3rem;">
+      <div class="card" style="--card-accent:linear-gradient(90deg,var(--pulse),var(--green));">
+        <div class="card-icon" style="color:var(--pulse);">⚛️</div>
+        <div class="card-tag">EQUAZIONE DI DRAKE</div>
+        <h3>IL CALCOLO DELL'INCONTRO</h3>
+        <p>L'equazione di Drake stima il numero di civiltà comunicanti nella Via Lattea. Anche con valori conservativi, il risultato è centinaia di migliaia. Il silenzio di Fermi è il vero mistero.</p>
+      </div>
+      <div class="card" style="--card-accent:linear-gradient(90deg,var(--aurora),var(--signal));">
+        <div class="card-icon" style="color:var(--aurora);">🌀</div>
+        <div class="card-tag">PARADOSSO DI FERMI</div>
+        <h3>DOVE SONO TUTTI?</h3>
+        <p>Se le civiltà avanzate esistono, perché non le abbiamo ancora incontrate? Ipotesi: filtro cosmico, distanze, comunicazione non elettromagnetica, o presenza già avvenuta.</p>
+      </div>
+      <div class="card" style="--card-accent:linear-gradient(90deg,var(--gold),var(--signal));">
+        <div class="card-icon" style="color:var(--gold);">⬡</div>
+        <div class="card-tag">SCALA DI KARDASHEV</div>
+        <h3>LIVELLI DI CIVILTÀ</h3>
+        <p>Tipo I: domina il pianeta. Tipo II: sfrutta la stella. Tipo III: controlla la galassia. Siamo attorno a 0,73. Una Tipo III sarebbe indistinguibile da fenomeni naturali per noi.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════ MANIFESTO ══════════════════════ -->
+<section id="manifesto">
+  <div class="nebula-bg">
+    <div class="nebula-orb" style="width:700px;height:700px;background:var(--aurora);top:50%;left:50%;transform:translate(-50%,-50%);--nd:30s;--tx:20px;--ty:20px;"></div>
+  </div>
+  <div class="section-inner" style="position:relative;z-index:2;">
+    <div class="section-label reveal" style="justify-content:center;">SEZIONE 05</div>
+    <div class="reveal" style="margin-bottom:3rem;">
+      <div class="manifesto-quote">
+        Non siamo guardiani dell'universo. Siamo suoi figli dispersi, ancora ignari della nostra origine, ma già capaci di alzare lo sguardo verso casa.
+      </div>
+      <div class="manifesto-source">— ETERNAUTA, CODICE OMEGA, ANNO ZERO</div>
+    </div>
+
+    <div class="cards-grid reveal">
+      <div class="card" style="--card-accent:linear-gradient(90deg,var(--pulse),var(--aurora));text-align:center;">
+        <div class="card-icon" style="color:var(--pulse);font-size:3rem;">🌍</div>
+        <div class="card-tag" style="justify-content:center;display:flex;">PRINCIPIO</div>
+        <h3 style="text-align:center;">NON SIAMO SOLI</h3>
+        <p style="text-align:center;">L'universo è troppo vasto, troppo antico, troppo prolifico per aver generato intelligenza una sola volta, su un solo pianeta, in questa piccola galassia periferica.</p>
+      </div>
+      <div class="card" style="--card-accent:linear-gradient(90deg,var(--aurora),var(--gold));text-align:center;">
+        <div class="card-icon" style="color:var(--aurora);font-size:3rem;">🔓</div>
+        <div class="card-tag" style="justify-content:center;display:flex;">MISSIONE</div>
+        <h3 style="text-align:center;">NESSUNA VERITÀ È PROIBITA</h3>
+        <p style="text-align:center;">La ricerca non si ferma davanti a etichette. "Classificato", "non ufficiale", "speculativo": sono categorie amministrative, non epistemologiche.</p>
+      </div>
+      <div class="card" style="--card-accent:linear-gradient(90deg,var(--gold),var(--green));text-align:center;">
+        <div class="card-icon" style="color:var(--gold);font-size:3rem;">📡</div>
+        <div class="card-tag" style="justify-content:center;display:flex;">METODO</div>
+        <h3 style="text-align:center;">DATI, NON DOGMI</h3>
+        <p style="text-align:center;">Ogni avvistamento è un dato. Ogni anomalia è un'ipotesi. Ogni frequenza non identificata è una domanda. Il metodo scientifico applicato all'inconoscibile.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════ CONTATTO ══════════════════════ -->
+<section id="contatto">
+  <div class="section-inner">
+    <div class="section-label reveal">SEZIONE 06</div>
+    <h2 class="section-title reveal">Apri<br><span style="color:var(--pulse);">la Frequenza</span></h2>
+    <p class="section-desc reveal">Trasmetti le tue coordinate. Un segnale nell'oscurità è il primo passo verso il contatto.</p>
+
+    <div class="contact-grid reveal">
+      <div>
+        <div class="freq-display">1420.40<br><span style="font-size:0.4em;color:var(--dim);">MHz</span></div>
+        <div class="freq-label">FREQUENZA IDROGENO — LINEA 21cm</div>
+        <div class="signal-bars">
+          <div class="sig-bar" style="height:60%;--d:0.8s;animation-delay:0s;"></div>
+          <div class="sig-bar" style="height:40%;--d:1.1s;animation-delay:0.1s;"></div>
+          <div class="sig-bar" style="height:90%;--d:0.9s;animation-delay:0.2s;"></div>
+          <div class="sig-bar" style="height:70%;--d:1.3s;animation-delay:0.3s;"></div>
+          <div class="sig-bar" style="height:50%;--d:0.7s;animation-delay:0.4s;"></div>
+          <div class="sig-bar" style="height:100%;--d:1s;animation-delay:0.5s;"></div>
+          <div class="sig-bar" style="height:35%;--d:1.2s;animation-delay:0.6s;"></div>
+          <div class="sig-bar" style="height:80%;--d:0.85s;animation-delay:0.7s;"></div>
+          <div class="sig-bar" style="height:55%;--d:1.1s;animation-delay:0.8s;"></div>
+          <div class="sig-bar" style="height:65%;--d:0.95s;animation-delay:0.9s;"></div>
+        </div>
+
+        <div style="margin-top:2.5rem;">
+          <div class="section-label" style="font-size:0.65rem;margin-bottom:1rem;">COORDINATE OPERATIVE</div>
+          <div style="font-family:var(--font-mono);font-size:0.8rem;color:var(--dim);line-height:2.2;">
+            <div>◈ <span style="color:var(--pulse);">SETTORE:</span> Via Lattea, Braccio di Orione</div>
+            <div>◈ <span style="color:var(--pulse);">PIANETA:</span> Terra (3° da Sol)</div>
+            <div>◈ <span style="color:var(--pulse);">STATO:</span> <span style="color:var(--green);">TRASMISSIONE ATTIVA</span></div>
+            <div>◈ <span style="color:var(--pulse);">ENCRYP:</span> OMEGA-7 / AES-2048</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="contact-form">
+        <input type="text" class="form-field" placeholder="// DESIGNAZIONE O CODICE NOME">
+        <input type="email" class="form-field" placeholder="// FREQUENZA DI RISPOSTA (EMAIL)">
+        <select class="form-field" style="appearance:none;cursor:pointer;">
+          <option value="" disabled selected>// TIPOLOGIA SEGNALE</option>
+          <option>Avvistamento personale</option>
+          <option>Analisi dati</option>
+          <option>Collaborazione ricerca</option>
+          <option>Testimonianza</option>
+          <option>Fenomeno anomalo</option>
+        </select>
+        <textarea class="form-field" placeholder="// TRASCRIVI IL TUO MESSAGGIO — CLEARANCE RICHIESTA"></textarea>
+        <button class="form-btn">⬡ TRASMETTI IL SEGNALE</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════ FOOTER ══════════════════════ -->
+<footer>
+  <div class="footer-logo">✦ ETERNAUTA ✦</div>
+  <div style="font-family:var(--font-mono);font-size:0.7rem;color:var(--dim);letter-spacing:0.2em;margin-bottom:2rem;">
+    VIAGGIATORE DELL'ETERNO — OLTRE I CONFINI DEL COSMO
+  </div>
+
+  <div class="socials">
+    <a href="#" class="social-link">
+      <span class="social-icon">𝕏</span> TWITTER/X
+    </a>
+    <a href="#" class="social-link">
+      <span class="social-icon">📸</span> INSTAGRAM
+    </a>
+    <a href="#" class="social-link">
+      <span class="social-icon">▶</span> YOUTUBE
+    </a>
+    <a href="#" class="social-link">
+      <span class="social-icon">💬</span> TELEGRAM
+    </a>
+    <a href="#" class="social-link">
+      <span class="social-icon">🎮</span> DISCORD
+    </a>
+    <a href="#" class="social-link">
+      <span class="social-icon">🎵</span> TIKTOK
+    </a>
+    <a href="#" class="social-link">
+      <span class="social-icon">👥</span> FACEBOOK
+    </a>
+    <a href="#" class="social-link">
+      <span class="social-icon">in</span> LINKEDIN
+    </a>
+  </div>
+
+  <div class="footer-divider"></div>
+
+  <div class="footer-copy">
+    © 2025 ETERNAUTA — CLASSIFICAZIONE: PUBBLICA — LIVELLO ALFA<br>
+    "LA VERITÀ NON HA BISOGNO DI PERMESSO PER ESISTERE"<br>
+    <span style="color:rgba(0,212,255,0.2);">◈ SISTEMA OPERATIVO: COSMOS v∞ ◈</span>
+  </div>
+</footer>
+
+<!-- TOP BUTTON -->
+<button id="top-btn" onclick="window.scrollTo({top:0,behavior:'smooth'})">↑</button>
+
+<script>
+  // ─── STARFIELD ───
+  const sf = document.getElementById('starfield');
+  for (let i = 0; i < 220; i++) {
+    const s = document.createElement('div');
+    s.className = 'star';
+    const size = Math.random() * 2.5 + 0.5;
+    s.style.cssText = `
+      left:${Math.random()*100}%;
+      top:${Math.random()*100}%;
+      width:${size}px; height:${size}px;
+      --d:${Math.random()*4+2}s;
+      --o:${Math.random()*0.6+0.2};
+      animation-delay:${Math.random()*5}s;
+    `;
+    sf.appendChild(s);
+  }
+
+  // ─── PROGRESS BAR ───
+  const bar = document.getElementById('progress-bar');
+  window.addEventListener('scroll', () => {
+    const max = document.body.scrollHeight - window.innerHeight;
+    bar.style.width = (window.scrollY / max * 100) + '%';
+
+    // top btn
+    document.getElementById('top-btn').classList.toggle('visible', window.scrollY > 400);
+
+    // reveal elements
+    document.querySelectorAll('.reveal, .tl-item').forEach(el => {
+      const rect = el.getBoundingClientRect();
+      if (rect.top < window.innerHeight - 80) el.classList.add('visible');
+    });
+  });
+
+  // ─── HAMBURGER ───
+  const ham = document.getElementById('hamburger');
+  const nav = document.getElementById('nav-overlay');
+  ham.addEventListener('click', () => {
+    ham.classList.toggle('open');
+    nav.classList.toggle('open');
+  });
+  document.querySelectorAll('.nav-link').forEach(l => {
+    l.addEventListener('click', () => {
+      ham.classList.remove('open');
+      nav.classList.remove('open');
+    });
+  });
+
+  // ─── CURSOR ───
+  const dot = document.getElementById('cursorDot');
+  const ring = document.getElementById('cursorRing');
+  let mx = 0, my = 0, rx = 0, ry = 0;
+  document.addEventListener('mousemove', e => { mx = e.clientX; my = e.clientY; });
+  function animateCursor() {
+    rx += (mx - rx) * 0.12; ry += (my - ry) * 0.12;
+    dot.style.left = mx + 'px'; dot.style.top = my + 'px';
+    ring.style.left = rx + 'px'; ring.style.top = ry + 'px';
+    requestAnimationFrame(animateCursor);
+  }
+  animateCursor();
+
+  // ─── INITIAL REVEAL ───
+  window.dispatchEvent(new Event('scroll'));
+
+  // ─── CARD TILT EFFECT ───
+  document.querySelectorAll('.card, .cosmos-card').forEach(card => {
+    card.addEventListener('mousemove', e => {
+      const r = card.getBoundingClientRect();
+      const x = (e.clientX - r.left) / r.width - 0.5;
+      const y = (e.clientY - r.top) / r.height - 0.5;
+      card.style.transform = `perspective(600px) rotateY(${x*8}deg) rotateX(${-y*8}deg) translateY(-8px)`;
+    });
+    card.addEventListener('mouseleave', () => {
+      card.style.transform = '';
+      card.style.transition = 'transform 0.5s ease';
+    });
+  });
+
+  // ─── GLITCH OCCASIONAL ───
+  setInterval(() => {
+    const title = document.querySelector('.hero-title');
+    if (title) {
+      title.style.letterSpacing = '0.15em';
+      setTimeout(() => title.style.letterSpacing = '0.05em', 80);
+    }
+  }, 7000);
+</script>
+</body>
+</html>
